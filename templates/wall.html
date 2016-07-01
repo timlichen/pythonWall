@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Wall</title>
+  <style>
+    /**{
+      margin: 0px;
+      padding: 0px;
+    }*/
+    .message_box{
+      background-color: lightblue;
+      border: 1px black solid;
+      border-bottom: 0px;
+      padding: 5px;
+    }
+    .comment{
+      background-color: lightgreen;
+      margin-left: 10px;
+    }
+    .comment_box{
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Coding Dojo Wall (Python)</h1>
+    <h3>Post a Message</h3>
+    <a href='/logOff'>Log Off</a>
+  </div>
+
+  <form action="/createMessage" method="post">
+    <p><textarea rows="8" cols="100" name="message"></textarea></p>
+    <input type="submit" value="Post a message">
+  </form>
+
+  <h3>Messages</h3>
+  {% for message in all_messages%}
+    <div class="message_box">
+      <p>Message: {{ message['message']}}</p>
+      <p>Posted At: {{message['created_at']}}</p>
+      <p>Posted By: {{message['first_name']}} {{message['last_name']}}
+      {% for comment in all_comments %}
+        {% if comment['message_id'] == message['messageID'] %}
+        <div class="comment">
+          <p>Comment: {{ comment['comment']}}</p>
+          <p>Posted At: {{comment['created_at']}}</p>
+          <p>Posted By: {{comment['first_name']}} {{comment['last_name']}}
+        </div>
+        {% endif %}
+        {% if session['user_id'] == comment['user_id'] %}
+          <form action="/deleteComment" method="post">
+            <input type="hidden" name="commentID" value="{{comment['comment_id']}}">
+            <input type="submit" value="Delete Comment">
+          </form>
+        {% endif %}
+      {% endfor%}
+      <form class="comment_box" action="/comment" method="post">
+        <h3>Leave Comment</h3>
+        <input type="text" name="comment">
+        <input type="hidden" name="message_id" value="{{ message['messageID']}}">
+        <input type="submit" value="Submit Comment">
+      </form>
+      {% if session['user_id'] == message['user_id'] %}
+        <form action="/delete" method="post">
+          <input type="hidden" name="messageID" value="{{message['messageID']}}">
+          <input type="submit" value="Delete Message">
+        </form>
+      {% endif %}
+    </div>
+  {% endfor %}
+
+</body>
+</html>
